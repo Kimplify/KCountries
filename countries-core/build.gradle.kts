@@ -1,10 +1,10 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.maven.publish)
 }
 
 kotlin {
@@ -13,30 +13,30 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosArm64(),
-        iosSimulatorArm64()
+        iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "CountriesCore"
             isStatic = true
         }
     }
-    
+
     jvm()
-    
+
     js {
         browser()
         binaries.executable()
     }
-    
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
         binaries.executable()
     }
-    
+
     sourceSets {
         androidMain.dependencies {
 
@@ -53,14 +53,51 @@ kotlin {
 }
 
 android {
-    namespace = "org.kimplify.countries"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    namespace = "org.kimplify.countries-core"
+    compileSdk = 35
 
     defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
+        minSdk = 21
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+}
+
+//Publishing your Kotlin Multiplatform library to Maven Central
+//https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-libraries.html
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+    coordinates("org.kimplify", "countries-core", "0.1.0")
+
+    pom {
+        name = "KCountries"
+        description = "Kotlin Multiplatform library providing ISO 3166-1 country codes, names and flag emojis."
+        url = "https://github.com/Kimplify/KCountries"
+
+        licenses {
+            license {
+                name = "MIT License"
+                url = "https://opensource.org/licenses/MIT"
+            }
+        }
+
+        developers {
+            developer {
+                id = "merkost"
+                name = "Konstantin Merenkov"
+                email = "kosta0212@gmail.com"
+            }
+
+            developer {
+                id = "diogocavaiar"
+                name = "Diogo Cavaiar"
+                email = "cavaiarconsulting@gmail.com"
+            }
+        }
+
+        scm {
+            connection = "scm:git:https://github.com/Kimplify/KCountries"
+            developerConnection = "scm:git:ssh://git@github.com/Kimplify/KCountries.git"
+            url = "https://github.com/Kimplify/KCountries"
+        }
     }
 }

@@ -1,6 +1,8 @@
-# Countries-Core
+# KCountries
 
-A lightweight, high-performance Kotlin Multiplatform library providing ISO 3166-1 country data for Android, iOS, JVM Desktop, JavaScript, and WebAssembly platforms.
+A lightweight, high-performance Kotlin Multiplatform library that embeds the full ISO 3166-1 country dataset (alpha-2, alpha-3 and numeric codes, names and flag emojis) and gives you seamless access across Android, iOS, JVM, JavaScript and WebAssembly.
+
+Designed for simplicity, speed and minimal footprint — ideal when you just need world-wide country metadata without introducing heavy dependencies or resource bundles.
 
 ## Features
 
