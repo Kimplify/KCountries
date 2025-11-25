@@ -45,6 +45,7 @@ kotlin {
             implementation(libs.kotlin.codepoints)
         }
         commonTest.dependencies {
+            implementation(kotlin("test"))
         }
         jvmMain.dependencies {
 
@@ -53,7 +54,7 @@ kotlin {
 }
 
 android {
-    namespace = "org.kimplify.countries-core"
+    namespace = "org.kimplify.countriesCore"
     compileSdk = 35
 
     defaultConfig {
