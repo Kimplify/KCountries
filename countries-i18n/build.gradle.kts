@@ -65,7 +65,7 @@ android {
 mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
-    coordinates("org.kimplify", "countries-i18n", "0.1.1")
+    coordinates("org.kimplify", "countries-i18n", libs.versions.kcountries.get())
 
     pom {
         name = "KCountries I18n"
