@@ -13,7 +13,9 @@ internal object TestCountries {
         alpha3 = Alpha3Code("USA"),
         numeric = NumericCode("840"),
         name = CountryName("United States of America (the)"),
-        flag = FlagEmoji("\uD83C\uDDFA\uD83C\uDDF8")
+        flag = FlagEmoji("\uD83C\uDDFA\uD83C\uDDF8"),
+        displayName = "United States",
+        native = "United States"
     )
 
     val unitedKingdom = Country(
@@ -21,7 +23,9 @@ internal object TestCountries {
         alpha3 = Alpha3Code("GBR"),
         numeric = NumericCode("826"),
         name = CountryName("United Kingdom of Great Britain and Northern Ireland (the)"),
-        flag = FlagEmoji("\uD83C\uDDEC\uD83C\uDDE7")
+        flag = FlagEmoji("\uD83C\uDDEC\uD83C\uDDE7"),
+        displayName = "United Kingdom",
+        native = "United Kingdom"
     )
 
     val canada = Country(

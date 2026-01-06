@@ -8,8 +8,10 @@ package org.kimplify.countries.model
  * @property alpha2 ISO 3166-1 alpha-2 country code (2 letters).
  * @property alpha3 ISO 3166-1 alpha-3 country code (3 letters).
  * @property numeric ISO 3166-1 numeric country code (3 digits).
- * @property name Country name in English.
+ * @property name Formal ISO 3166-1 English name.
  * @property flag Country flag emoji (Unicode regional indicator symbols).
+ * @property displayName Optional user-friendly English name (e.g., "United States" instead of "United States of America (the)").
+ * @property native Optional native language name (e.g., "Deutschland" for Germany, "日本" for Japan).
  */
 data class Country(
     val alpha2: Alpha2Code,
@@ -17,4 +19,6 @@ data class Country(
     val numeric: NumericCode,
     val name: CountryName,
     val flag: FlagEmoji,
+    val displayName: String? = null,
+    val native: String? = null
 )

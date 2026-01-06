@@ -95,3 +95,59 @@ val String.toAlpha2: String?
  */
 val String.toAlpha3: String?
     get() = toCountry()?.alpha3?.value
+
+/**
+ * Gets the user-friendly display name, falling back to the formal ISO name.
+ *
+ * Example:
+ * ```
+ * val country = Countries.repository.findByAlpha2(Alpha2Code("US"))
+ * val name = country?.getDisplayName()  // Returns "United States"
+ * ```
+ *
+ * @receiver The Country object.
+ * @return The display name if available, otherwise the formal ISO name.
+ */
+fun Country.getDisplayName(): String = displayName ?: name.value
+
+/**
+ * Gets the native language name, falling back to display name or formal name.
+ *
+ * Example:
+ * ```
+ * val country = Countries.repository.findByAlpha2(Alpha2Code("DE"))
+ * val name = country?.getNativeName()  // Returns "Deutschland"
+ * ```
+ *
+ * @receiver The Country object.
+ * @return The native name if available, otherwise falls back to displayName or formal name.
+ */
+fun Country.getNativeName(): String = native ?: displayName ?: name.value
+
+/**
+ * Gets the user-friendly display name for a country code.
+ *
+ * Example:
+ * ```
+ * val name = "US".displayCountryName  // Returns "United States"
+ * ```
+ *
+ * @receiver The country code string (alpha-2, alpha-3, or numeric).
+ * @return The display name, or null if country not found.
+ */
+val String.displayCountryName: String?
+    get() = toCountry()?.getDisplayName()
+
+/**
+ * Gets the native language name for a country code.
+ *
+ * Example:
+ * ```
+ * val name = "DE".nativeCountryName  // Returns "Deutschland"
+ * ```
+ *
+ * @receiver The country code string (alpha-2, alpha-3, or numeric).
+ * @return The native name, or null if country not found.
+ */
+val String.nativeCountryName: String?
+    get() = toCountry()?.native

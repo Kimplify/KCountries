@@ -1,61 +1,50 @@
 # KCountries
 
-A lightweight, high-performance Kotlin Multiplatform library that embeds the full ISO 3166-1 country dataset (alpha-2, alpha-3 and numeric codes, names and flag emojis) and gives you seamless access across Android, iOS, JVM, JavaScript and WebAssembly.
-
-Designed for simplicity, speed and minimal footprint — ideal when you just need world-wide country metadata without introducing heavy dependencies or resource bundles.
+A lightweight, high-performance Kotlin Multiplatform library providing ISO 3166-1 country data with native names and multilingual support across Android, iOS, JVM, JavaScript and WebAssembly.
 
 ## Features
 
-- **249 Countries**: Complete ISO 3166-1 dataset
+- **249 Countries**: Complete ISO 3166-1 dataset with codes, names, and flags
+- **Native Names**: Authentic country names in local scripts (日本, Россия, مصر, etc.)
+- **7 Languages**: Optional i18n module with Spanish, French, German, Arabic, Chinese, Russian
+- **User-Friendly Names**: Display names without formal ISO formatting
 - **Type-Safe API**: Inline value classes for codes (zero runtime overhead)
-- **Multiple Access Patterns**: Repository pattern, DSL queries, and extension functions
+- **Multiple Access Patterns**: Repository, DSL queries, and extension functions
 - **Platform Support**: Android, iOS, JVM, JS, WASM
-- **Minimal Size**: ~25KB embedded data
-- **Fast Performance**: O(1) hash-indexed lookups, <10ms initialization
+- **Minimal Size**: ~50KB core + ~50KB i18n (optional)
+- **Fast Performance**: O(1) hash-indexed lookups
 
 ## Installation
 
-Add the dependency to your `commonMain` source set:
-
 ```kotlin
-kotlin {
-    sourceSets {
-        commonMain.dependencies {
-            implementation(project(":countries-core"))
-        }
-    }
+dependencies {
+    implementation("org.kimplify:countries-core:0.1.0")
+
+    // Optional: Multilingual support
+    implementation("org.kimplify:countries-i18n:0.1.1")
 }
 ```
 
 ## Usage
 
-### Repository Pattern (Simple)
+### Repository Pattern
 
 ```kotlin
-import org.kimplify.countries.Countries
-import org.kimplify.countries.model.*
-
 // Get all countries
-val allCountries: List<Country> = Countries.repository.getAll()
+val allCountries = Countries.repository.getAll()
 
-// Find by alpha-2 code
-val usa: Country? = Countries.repository.findByAlpha2(Alpha2Code("US"))
+// Find by code
+val usa = Countries.repository.findByAlpha2(Alpha2Code("US"))
+val uk = Countries.repository.findByAlpha3(Alpha3Code("GBR"))
+val france = Countries.repository.findByNumeric(NumericCode("250"))
 
-// Find by alpha-3 code
-val uk: Country? = Countries.repository.findByAlpha3(Alpha3Code("GBR"))
-
-// Find by numeric code
-val france: Country? = Countries.repository.findByNumeric(NumericCode("250"))
-
-// Search by name
-val results: List<Country> = Countries.repository.searchByName("United")
+// Search by name (searches across display, native, and formal names)
+val results = Countries.repository.searchByName("United")
 ```
 
-### DSL Query Builder (Powerful)
+### DSL Query Builder
 
 ```kotlin
-import org.kimplify.countries.Countries
-
 // Single filter
 val usa = Countries.repository.query {
     alpha2("US")
@@ -75,27 +64,26 @@ val northAmericans = Countries.repository.query {
     }
 }.toList()
 
-// Complex queries
-val results = Countries.repository.query {
+// Count results
+val count = Countries.repository.query {
     nameStartsWith("United")
 }.count()
 ```
 
-### Extension Functions (Convenient)
+### Extension Functions
 
 ```kotlin
-import org.kimplify.countries.extensions.*
-
 // Convert code to country
 val usa = "US".toCountry()
 val france = "FRA".toCountry()
 val germany = "276".toCountry()
 
-// Get properties directly
-val flag = "US".flagEmoji  // "🇺🇸"
-val name = "GB".countryName  // "United Kingdom of Great Britain and Northern Ireland (the)"
+// Get properties
+val flag = "US".flagEmoji            // "🇺🇸"
+val displayName = "US".displayCountryName  // "United States"
+val nativeName = "JP".nativeCountryName   // "日本"
 
-// Convert between code formats
+// Convert between formats
 val alpha3 = "US".toAlpha3  // "USA"
 val alpha2 = "USA".toAlpha2  // "US"
 ```
@@ -106,12 +94,20 @@ val alpha2 = "USA".toAlpha2  // "US"
 
 ```kotlin
 data class Country(
-    val alpha2: Alpha2Code,     // ISO 3166-1 alpha-2 (e.g., "US")
-    val alpha3: Alpha3Code,     // ISO 3166-1 alpha-3 (e.g., "USA")
-    val numeric: NumericCode,   // ISO 3166-1 numeric (e.g., "840")
-    val name: CountryName,      // English name (e.g., "United States of America (the)")
-    val flag: FlagEmoji,        // Flag emoji (e.g., "🇺🇸")
+    val alpha2: Alpha2Code,        // ISO 3166-1 alpha-2 (e.g., "US")
+    val alpha3: Alpha3Code,        // ISO 3166-1 alpha-3 (e.g., "USA")
+    val numeric: NumericCode,      // ISO 3166-1 numeric (e.g., "840")
+    val name: CountryName,         // Formal ISO name (e.g., "United States of America (the)")
+    val flag: FlagEmoji,           // Flag emoji (e.g., "🇺🇸")
+    val displayName: String? = null,  // User-friendly name (e.g., "United States")
+    val native: String? = null        // Native language name (e.g., "日本")
 )
+```
+
+```kotlin
+// Extension functions for easy access
+country.getDisplayName()  // Returns displayName or falls back to name
+country.getNativeName()   // Returns native or falls back to displayName/name
 ```
 
 ### Value Classes (Type-Safe Wrappers)
@@ -174,22 +170,19 @@ class CountriesQueryResult {
 
 ## Performance
 
-- **Memory footprint**: <50KB
+- **Core library**: ~50KB (249 countries with native names)
+- **I18n module**: ~50KB (6 languages × 250 translations)
 - **Initialization**: <10ms (lazy)
-- **Lookups by code**: <1ms (O(1) hash index)
-- **Search by name**: <1ms (linear scan over 249 countries)
-- **Binary size**: ~25KB increase
+- **Lookups**: O(1) hash-indexed, <1ms
+- **Translations**: O(1) map lookup
 
 ## Architecture
 
-### Embedded Data Strategy
-
-Country data is embedded as Kotlin code (not JSON/resources) for:
-- **Best performance**: Instant access, no parsing
-- **Smallest size**: ~25KB for 249 countries
-- **Platform consistency**: Works identically on all 5 targets
-- **Type safety**: Compile-time validation
-- **No I/O**: No file loading or resource handling
+Country data is embedded as Kotlin code for maximum performance:
+- **Instant access**: No parsing, no I/O
+- **Type-safe**: Compile-time validation
+- **Multiplatform**: Single implementation for all targets
+- **Offline-first**: No network dependencies
 
 ### Platform Support
 
@@ -209,24 +202,28 @@ Semantic versioning: `MAJOR.MINOR.PATCH`
 - **Data updates**: MINOR bump (e.g., 1.1.0)
 - **API changes**: MAJOR bump (e.g., 2.0.0)
 
-## Future Extensions
+## Internationalization (countries-i18n)
 
-The core library is designed to be extended by optional modules:
+Optional module providing country name translations in 6 languages.
 
 ```kotlin
-// Future: countries-i18n module
-fun Country.localizedName(locale: Locale): String
-val Country.nativeName: String
+val country = Countries.repository.findByAlpha2(Alpha2Code("JP"))!!
 
-// Future: countries-phone module
-val Country.dialCode: String
-fun Country.formatPhoneNumber(number: String): String
-
-// Future: countries-subdivisions module
-val Country.subdivisions: List<Subdivision>
+country.getLocalizedName(Locale.EN)  // "Japan"
+country.getLocalizedName(Locale.ES)  // "Japón"
+country.getLocalizedName(Locale.FR)  // "Japon"
+country.getLocalizedName(Locale.DE)  // "Japan"
+country.getLocalizedName(Locale.AR)  // "اليابان"
+country.getLocalizedName(Locale.ZH)  // "日本"
+country.getLocalizedName(Locale.RU)  // "Япония"
 ```
 
-Core API remains stable across all extensions.
+**Supported Languages:**
+- English (en), Spanish (es), French (fr), German (de)
+- Arabic (ar) with RTL support
+- Chinese (zh), Russian (ru)
+
+See [countries-i18n/README.md](countries-i18n/README.md) for full documentation.
 
 ## License
 

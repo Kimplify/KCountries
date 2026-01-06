@@ -47,6 +47,8 @@ interface CountriesRepository {
     /**
      * Searches countries by name using case-insensitive partial matching.
      *
+     * Searches across formal ISO name, user-friendly display name, and native name.
+     *
      * @param query The search query string.
      * @return List of countries whose names contain the query string.
      */
@@ -109,8 +111,10 @@ internal class InMemoryCountriesRepository(
         if (query.isBlank()) return emptyList()
 
         val normalizedQuery = query.trim().lowercase()
-        return countries.filter {
-            it.name.value.lowercase().contains(normalizedQuery)
+        return countries.filter { country ->
+            country.name.value.lowercase().contains(normalizedQuery) ||
+            country.displayName?.lowercase()?.contains(normalizedQuery) == true ||
+            country.native?.lowercase()?.contains(normalizedQuery) == true
         }
     }
 

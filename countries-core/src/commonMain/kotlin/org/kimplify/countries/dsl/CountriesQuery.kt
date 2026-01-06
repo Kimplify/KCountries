@@ -91,6 +91,8 @@ class CountriesQuery internal constructor(
     /**
      * Filters countries whose name contains the given text (case-insensitive).
      *
+     * Searches across formal ISO name, display name, and native name.
+     *
      * Example:
      * ```
      * query {
@@ -102,11 +104,17 @@ class CountriesQuery internal constructor(
      */
     fun nameContains(text: String) {
         val normalized = text.lowercase()
-        predicates.add { it.name.value.lowercase().contains(normalized) }
+        predicates.add { country ->
+            country.name.value.lowercase().contains(normalized) ||
+            country.displayName?.lowercase()?.contains(normalized) == true ||
+            country.native?.lowercase()?.contains(normalized) == true
+        }
     }
 
     /**
      * Filters countries whose name exactly matches the given text (case-insensitive).
+     *
+     * Searches across formal ISO name, display name, and native name.
      *
      * Example:
      * ```
@@ -119,11 +127,17 @@ class CountriesQuery internal constructor(
      */
     fun nameEquals(name: String) {
         val normalized = name.lowercase()
-        predicates.add { it.name.value.lowercase() == normalized }
+        predicates.add { country ->
+            country.name.value.lowercase() == normalized ||
+            country.displayName?.lowercase() == normalized ||
+            country.native?.lowercase() == normalized
+        }
     }
 
     /**
      * Filters countries whose name starts with the given text (case-insensitive).
+     *
+     * Searches across formal ISO name, display name, and native name.
      *
      * Example:
      * ```
@@ -136,7 +150,11 @@ class CountriesQuery internal constructor(
      */
     fun nameStartsWith(prefix: String) {
         val normalized = prefix.lowercase()
-        predicates.add { it.name.value.lowercase().startsWith(normalized) }
+        predicates.add { country ->
+            country.name.value.lowercase().startsWith(normalized) ||
+            country.displayName?.lowercase()?.startsWith(normalized) == true ||
+            country.native?.lowercase()?.startsWith(normalized) == true
+        }
     }
 
     /**

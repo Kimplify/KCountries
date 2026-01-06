@@ -19,7 +19,7 @@ kotlin {
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "CountriesCore"
+            baseName = "CountriesI18n"
             isStatic = true
         }
     }
@@ -42,7 +42,7 @@ kotlin {
 
         }
         commonMain.dependencies {
-            implementation(libs.kotlin.codepoints)
+            implementation(project(":countries-core"))
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
@@ -54,7 +54,7 @@ kotlin {
 }
 
 android {
-    namespace = "org.kimplify.countriesCore"
+    namespace = "org.kimplify.countriesI18n"
     compileSdk = 35
 
     defaultConfig {
@@ -62,16 +62,14 @@ android {
     }
 }
 
-//Publishing your Kotlin Multiplatform library to Maven Central
-//https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-libraries.html
 mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
-    coordinates("org.kimplify", "countries-core", "0.1.1")
+    coordinates("org.kimplify", "countries-i18n", "0.1.1")
 
     pom {
-        name = "KCountries"
-        description = "Kotlin Multiplatform library providing ISO 3166-1 country codes, names and flag emojis."
+        name = "KCountries I18n"
+        description = "Internationalization module for KCountries library providing country name translations in multiple languages."
         url = "https://github.com/Kimplify/KCountries"
 
         licenses {

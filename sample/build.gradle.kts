@@ -8,7 +8,6 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.composeHotReload)
 }
 
 kotlin {
@@ -48,6 +47,7 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(project(":countries-core"))
+            implementation(project(":countries-i18n"))
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)

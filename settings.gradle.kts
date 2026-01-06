@@ -33,4 +33,5 @@ plugins {
 }
 
 include(":countries-core")
+include(":countries-i18n")
 include(":sample")
