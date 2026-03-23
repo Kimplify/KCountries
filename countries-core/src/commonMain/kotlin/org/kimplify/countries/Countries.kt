@@ -39,7 +39,7 @@ object Countries {
     /**
      * Library version following semantic versioning (MAJOR.MINOR.PATCH).
      */
-    const val VERSION = "1.0.0"
+    val VERSION = BuildKConfig.VERSION
 
     /**
      * Total number of countries in the ISO 3166-1 dataset.

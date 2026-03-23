@@ -53,6 +53,29 @@ kotlin {
     }
 }
 
+val generateVersionFile = tasks.register("generateVersionFile") {
+    val version = libs.versions.kcountries.get()
+    val outputDir = layout.buildDirectory.dir("generated/version/kotlin")
+    outputs.dir(outputDir)
+    doLast {
+        val dir = outputDir.get().asFile.resolve("org/kimplify/countries")
+        dir.mkdirs()
+        dir.resolve("BuildKConfig.kt").writeText(
+            """
+            |package org.kimplify.countries
+            |
+            |internal object BuildKConfig {
+            |    const val VERSION = "$version"
+            |}
+            """.trimMargin()
+        )
+    }
+}
+
+kotlin.sourceSets.commonMain {
+    kotlin.srcDir(generateVersionFile.map { it.outputs.files.singleFile })
+}
+
 android {
     namespace = "org.kimplify.countriesCore"
     compileSdk = 35
