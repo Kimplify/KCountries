@@ -1,12 +1,13 @@
 # KCountries I18n
 
-Internationalization module for KCountries library providing country name translations in 6 major languages.
+Internationalization module for KCountries library providing country name translations in 13 languages.
 
 ## Features
 
-- **6 Languages**: English, Spanish, French, German, Arabic, Chinese, Russian
+- **14 Languages**: EN, ES, FR, DE, AR, ZH, RU, JA, PT, HI, KO, IT, TR, ID
 - **Type-Safe Locale**: ISO 639-1 validated locale value class
-- **250 Countries**: Comprehensive translation coverage (245+ for all languages)
+- **249 Countries**: Complete translation coverage for all languages
+- **Smart Normalization**: Accepts `"en-US"`, `"PT_BR"`, `"ES"` — extracts the language automatically
 - **Multiplatform**: Works on Android, iOS, JVM, JS, and WASM
 - **Zero Dependencies**: Standalone module with static data
 - **Fast**: O(1) lookup with in-memory maps
@@ -15,8 +16,8 @@ Internationalization module for KCountries library providing country name transl
 
 ```kotlin
 dependencies {
-    implementation("org.kimplify:countries-core:0.1.0")
-    implementation("org.kimplify:countries-i18n:0.1.0")
+    implementation("org.kimplify:countries-core:0.1.1")
+    implementation("org.kimplify:countries-i18n:0.1.1")
 }
 ```
 
@@ -44,8 +45,11 @@ country.getLocalizedName(Locale.RU)  // "Соединенные Штаты"
 ### Using String Locale Codes
 
 ```kotlin
-country.getLocalizedName("es")  // "Estados Unidos"
-country.getLocalizedName()      // "United States" (defaults to English)
+country.getLocalizedName("es")     // "Estados Unidos"
+country.getLocalizedName("es-MX")  // "Estados Unidos" (normalized to "es")
+country.getLocalizedName("PT_BR")  // "Estados Unidos da América" (normalized to "pt")
+country.getLocalizedName("EN")     // "United States" (normalized to "en")
+country.getLocalizedName()         // "United States" (defaults to English)
 ```
 
 ### Get All Translations
@@ -72,7 +76,7 @@ translations.forEach { (locale, name) ->
 import org.kimplify.countries.i18n.CountryTranslations
 
 CountryTranslations.supportedLocales
-// [Locale.EN, Locale.ES, Locale.FR, Locale.DE, Locale.AR, Locale.ZH, Locale.RU]
+// [ES, FR, DE, AR, ZH, RU, JA, PT, HI, KO, IT, TR, ID]
 ```
 
 ### Type-Safe Locale
@@ -88,13 +92,13 @@ val invalidCase = Locale("EN")  // ❌ Exception: must be lowercase
 Predefined constants for convenience:
 
 ```kotlin
-Locale.EN  // English
-Locale.ES  // Spanish
-Locale.FR  // French
-Locale.DE  // German
-Locale.AR  // Arabic
-Locale.ZH  // Chinese
-Locale.RU  // Russian
+Locale.EN  // English      Locale.AR  // Arabic
+Locale.ES  // Spanish      Locale.ZH  // Chinese
+Locale.FR  // French       Locale.RU  // Russian
+Locale.DE  // German       Locale.JA  // Japanese
+Locale.PT  // Portuguese   Locale.KO  // Korean
+Locale.HI  // Hindi        Locale.IT  // Italian
+Locale.TR  // Turkish      Locale.ID  // Indonesian
 ```
 
 ## Fallback Chain
@@ -117,13 +121,20 @@ country.getLocalizedName(Locale.EN)  // "United Kingdom" (display name)
 
 | Language | Code | Countries | Script |
 |----------|------|-----------|--------|
-| English | en | 249 | Latin |
-| Spanish | es | 250 | Latin |
-| French | fr | 250 | Latin |
-| German | de | 250 | Latin |
-| Arabic | ar | 250 | Arabic (RTL) |
-| Chinese | zh | 245 | Chinese |
-| Russian | ru | 250 | Cyrillic |
+| English | en | 249 | Latin (fallback) |
+| Spanish | es | 249 | Latin |
+| French | fr | 249 | Latin |
+| German | de | 249 | Latin |
+| Italian | it | 249 | Latin |
+| Portuguese | pt | 249 | Latin |
+| Turkish | tr | 249 | Latin |
+| Indonesian | id | 249 | Latin |
+| Arabic | ar | 249 | Arabic (RTL) |
+| Chinese | zh | 249 | CJK |
+| Japanese | ja | 249 | CJK |
+| Korean | ko | 249 | Hangul |
+| Hindi | hi | 249 | Devanagari |
+| Russian | ru | 249 | Cyrillic |
 
 ## Example: Compose UI with Locale Switcher
 
