@@ -245,7 +245,6 @@ internal val ruTranslations = mapOf(
     "VU" to "Вануату",
     "WF" to "Уоллис и Футуна",
     "WS" to "Самоа",
-    "XK" to "Республика Косово",
     "YE" to "Йемен",
     "YT" to "Майотта",
     "ZA" to "Южная Африка",

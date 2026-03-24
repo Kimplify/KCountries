@@ -170,7 +170,7 @@ internal object CountriesData {
             numeric = NumericCode("056"),
             name = CountryName("Belgium"),
             flag = FlagEmoji("🇧🇪"),
-            native = "Belgien"
+            native = "België / Belgique"
         ),
         Country(
             alpha2 = Alpha2Code("BF"),
@@ -1428,7 +1428,7 @@ internal object CountriesData {
             numeric = NumericCode("604"),
             name = CountryName("Peru"),
             flag = FlagEmoji("🇵🇪"),
-            native = "Piruw"
+            native = "Perú"
         ),
         Country(
             alpha2 = Alpha2Code("PF"),
@@ -1842,7 +1842,8 @@ internal object CountriesData {
             alpha2 = Alpha2Code("TR"),
             alpha3 = Alpha3Code("TUR"),
             numeric = NumericCode("792"),
-            name = CountryName("Turkey"),
+            name = CountryName("Türkiye"),
+            displayName = "Türkiye",
             flag = FlagEmoji("🇹🇷"),
             native = "Türkiye"
         ),

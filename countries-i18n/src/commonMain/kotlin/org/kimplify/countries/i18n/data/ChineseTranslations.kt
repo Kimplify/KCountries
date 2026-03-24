@@ -240,7 +240,6 @@ internal val zhTranslations = mapOf(
     "VU" to "瓦努阿图",
     "WF" to "瓦利斯和富图纳群岛",
     "WS" to "萨摩亚",
-    "XK" to "科索沃",
     "YE" to "也门",
     "YT" to "马约特",
     "ZA" to "南非",

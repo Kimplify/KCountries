@@ -1,6 +1,8 @@
 package org.kimplify.countries.i18n
 
-@kotlin.jvm.JvmInline
+import kotlin.jvm.JvmInline
+
+@JvmInline
 value class Locale(val code: String) {
     init {
         require(code.length == 2 && code.all { it.isLowerCase() && it.isLetter() }) {
