@@ -1,5 +1,4 @@
 rootProject.name = "Countries"
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
@@ -34,4 +33,5 @@ plugins {
 
 include(":countries-core")
 include(":countries-i18n")
-include(":sample")
+include(":sample:shared")
+include(":sample:androidApp")

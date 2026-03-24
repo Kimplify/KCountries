@@ -67,4 +67,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
 
       - name: Build library
-        run: ./gradlew :countries-core:build :countries-i18n:build --no-configuration-cache
+        run: ./gradlew :countries-core:build :countries-i18n:build
