@@ -25,7 +25,13 @@ object CountryTranslations {
     }
 
     fun getTranslation(alpha2: String, localeCode: String): String? {
-        return getTranslation(alpha2, Locale(localeCode))
+        val normalized = localeCode.split('-', '_').firstOrNull()?.lowercase() ?: return null
+        if (normalized.length != 2) return null
+        return try {
+            getTranslation(alpha2, Locale(normalized))
+        } catch (_: IllegalArgumentException) {
+            null
+        }
     }
 
     fun getAllTranslations(alpha2: String): Map<Locale, String> {

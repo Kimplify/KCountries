@@ -1,6 +1,7 @@
 package org.kimplify.countries.i18n
 
 import org.kimplify.countries.Countries
+import org.kimplify.countries.extensions.getDisplayName
 import org.kimplify.countries.i18n.extensions.getLocalizedName
 import org.kimplify.countries.model.Alpha2Code
 import kotlin.test.Test
@@ -143,7 +144,7 @@ class TranslationTest {
         val translatedCount = allCountries.count { country ->
             CountryTranslations.getTranslation(country.alpha2.value, Locale.ES) != null
         }
-        assertTrue(translatedCount >= 245)
+        assertEquals(249, translatedCount)
     }
 
     @Test
@@ -158,5 +159,30 @@ class TranslationTest {
         val translation = CountryTranslations.getTranslation("ES", Locale.ES)
         assertNotNull(translation)
         assertEquals("España", translation)
+    }
+
+    @Test
+    fun getLocalizedNameNormalizesLocaleStrings() {
+        val us = Countries.repository.findByAlpha2(Alpha2Code("US"))!!
+        assertEquals(us.getLocalizedName("es"), us.getLocalizedName(Locale.ES))
+        assertEquals(us.getLocalizedName("es"), us.getLocalizedName("ES"))
+        assertEquals(us.getLocalizedName("es"), us.getLocalizedName("es-MX"))
+        assertEquals(us.getLocalizedName("pt"), us.getLocalizedName("pt_BR"))
+        val fallback = us.getLocalizedName("xyz")
+        assertEquals(us.getDisplayName(), fallback)
+    }
+
+    @Test
+    fun allTranslationLocalesHaveComplete249Entries() {
+        val allCountries = Countries.repository.getAll()
+        CountryTranslations.supportedLocales.forEach { locale ->
+            var count = 0
+            allCountries.forEach { country ->
+                if (CountryTranslations.getTranslation(country.alpha2.value, locale) != null) {
+                    count++
+                }
+            }
+            assertEquals(249, count, "Locale ${locale.code} has only $count translations, expected 249")
+        }
     }
 }
