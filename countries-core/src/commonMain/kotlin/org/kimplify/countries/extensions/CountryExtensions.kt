@@ -2,6 +2,8 @@ package org.kimplify.countries.extensions
 
 import org.kimplify.countries.Countries
 import org.kimplify.countries.model.*
+import org.kimplify.countries.model.Continent
+import org.kimplify.countries.model.Region
 
 /**
  * Extension functions for convenient country lookups using strings.
@@ -151,3 +153,18 @@ val String.displayCountryName: String?
  */
 val String.nativeCountryName: String?
     get() = toCountry()?.native
+
+val String.callingCode: String?
+    get() = this.toCountry()?.callingCode?.value
+
+val String.currencyCode: String?
+    get() = this.toCountry()?.currency?.value
+
+val String.continent: Continent?
+    get() = this.toCountry()?.continent
+
+val String.region: Region?
+    get() = this.toCountry()?.region
+
+val String.timezone: String?
+    get() = this.toCountry()?.timezone?.value

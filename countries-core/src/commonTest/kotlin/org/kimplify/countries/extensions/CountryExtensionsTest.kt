@@ -1,5 +1,7 @@
 package org.kimplify.countries.extensions
 
+import org.kimplify.countries.model.Continent
+import org.kimplify.countries.model.Region
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -39,5 +41,20 @@ class CountryExtensionsTest {
         assertEquals("United States of America (the)", "usa".countryName)
         assertEquals("US", "USA".toAlpha2)
         assertEquals("USA", "840".toAlpha3)
+    }
+
+    @Test
+    fun newFieldExtensionsExposeCountryData() {
+        assertEquals("+1", "US".callingCode)
+        assertEquals("USD", "US".currencyCode)
+        assertEquals(Continent.NORTH_AMERICA, "US".continent)
+        assertEquals(Region.NORTHERN_AMERICA, "US".region)
+        assertEquals("America/New_York", "US".timezone)
+
+        assertNull("ZZ".callingCode)
+        assertNull("ZZ".currencyCode)
+        assertNull("ZZ".continent)
+        assertNull("ZZ".region)
+        assertNull("ZZ".timezone)
     }
 }
