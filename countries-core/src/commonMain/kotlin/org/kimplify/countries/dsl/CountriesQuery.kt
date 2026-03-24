@@ -5,6 +5,9 @@ import org.kimplify.countries.model.Continent
 import org.kimplify.countries.model.Region
 import org.kimplify.countries.repository.CountriesRepository
 
+@DslMarker
+annotation class CountriesDsl
+
 /**
  * DSL builder for querying countries with a fluent, declarative syntax.
  *
@@ -35,10 +38,11 @@ import org.kimplify.countries.repository.CountriesRepository
  *
  * @property repository The repository to query against.
  */
+@CountriesDsl
 class CountriesQuery internal constructor(
     private val repository: CountriesRepository
 ) {
-    private val predicates = mutableListOf<(Country) -> Boolean>()
+    internal val predicates = mutableListOf<(Country) -> Boolean>()
 
     /**
      * Filters countries by alpha-2 code (case-insensitive).
@@ -105,6 +109,7 @@ class CountriesQuery internal constructor(
      * @param text The text to search for in country names.
      */
     fun nameContains(text: String) {
+        if (text.isBlank()) return
         val normalized = text.lowercase()
         predicates.add { country ->
             country.name.value.lowercase().contains(normalized) ||
@@ -213,9 +218,36 @@ class CountriesQuery internal constructor(
      * @param block The DSL block containing predicates to combine with OR.
      */
     fun or(block: CountriesQuery.() -> Unit) {
-        val subQuery = CountriesQuery(repository).apply(block)
+        val subQuery = CountriesQuery(repository)
+        subQuery.block()
+        if (subQuery.predicates.isEmpty()) return
         predicates.add { country ->
             subQuery.predicates.any { predicate -> predicate(country) }
+        }
+    }
+
+    /**
+     * Excludes countries that match any predicate in the given block.
+     *
+     * Countries matching none of the predicates in the NOT block will be included.
+     *
+     * Example:
+     * ```
+     * query {
+     *     not {
+     *         continent(Continent.EUROPE)
+     *     }
+     * }
+     * ```
+     *
+     * @param block The DSL block containing predicates to negate.
+     */
+    fun not(block: CountriesQuery.() -> Unit) {
+        val subQuery = CountriesQuery(repository)
+        subQuery.block()
+        if (subQuery.predicates.isEmpty()) return
+        predicates.add { country ->
+            !subQuery.predicates.any { it(country) }
         }
     }
 
@@ -241,7 +273,8 @@ class CountriesQuery internal constructor(
  */
 class CountriesQueryResult internal constructor(
     private val countries: List<Country>
-) {
+) : Iterable<Country> {
+    override fun iterator(): Iterator<Country> = countries.iterator()
     /**
      * Returns the first matching country, or null if no matches.
      *
