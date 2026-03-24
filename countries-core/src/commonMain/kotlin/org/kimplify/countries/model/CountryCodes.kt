@@ -1,5 +1,7 @@
 package org.kimplify.countries.model
 
+import de.cketti.codepoints.codePointCount
+import de.cketti.codepoints.forEachCodePoint
 import kotlin.jvm.JvmInline
 
 /**
@@ -80,8 +82,11 @@ value class CountryName(val value: String) {
 @JvmInline
 value class FlagEmoji(val value: String) {
     init {
-        require(value.length in 4..8) {
-            "Flag emoji must be valid Unicode regional indicator sequence, got length: ${value.length}"
+        require(value.codePointCount() == 2) { "Flag emoji must consist of exactly 2 codepoints" }
+        value.forEachCodePoint { codePoint ->
+            require(codePoint in 0x1F1E6..0x1F1FF) {
+                "Flag emoji must consist of regional indicator symbols (U+1F1E6..U+1F1FF)"
+            }
         }
     }
 }
