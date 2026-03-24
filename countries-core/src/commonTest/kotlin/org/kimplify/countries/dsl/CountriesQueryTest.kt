@@ -7,6 +7,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import org.kimplify.countries.model.Continent
+import org.kimplify.countries.model.Region
 import org.kimplify.countries.repository.InMemoryCountriesRepository
 import org.kimplify.countries.testdata.TestCountries
 
@@ -82,5 +84,35 @@ class CountriesQueryTest {
         assertFailsWith<NoSuchElementException> {
             result.first()
         }
+    }
+
+    @Test
+    fun continentPredicateFiltersCorrectly() {
+        val result = repository.query { continent(Continent.EUROPE) }
+        assertEquals(2, result.count())
+    }
+
+    @Test
+    fun regionPredicateFiltersCorrectly() {
+        val result = repository.query { region(Region.WESTERN_EUROPE) }
+        assertEquals(1, result.count())
+    }
+
+    @Test
+    fun callingCodePredicateFiltersCorrectly() {
+        val result = repository.query { callingCode("+1") }
+        assertEquals(2, result.count())
+    }
+
+    @Test
+    fun currencyPredicateFiltersCorrectly() {
+        val result = repository.query { currency("GBP") }
+        assertEquals(1, result.count())
+    }
+
+    @Test
+    fun timezonePredicateFiltersCorrectly() {
+        val result = repository.query { timezone("Europe/Paris") }
+        assertEquals(1, result.count())
     }
 }

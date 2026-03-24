@@ -1,6 +1,8 @@
 package org.kimplify.countries.dsl
 
 import org.kimplify.countries.model.*
+import org.kimplify.countries.model.Continent
+import org.kimplify.countries.model.Region
 import org.kimplify.countries.repository.CountriesRepository
 
 /**
@@ -156,6 +158,41 @@ class CountriesQuery internal constructor(
             country.native?.lowercase()?.startsWith(normalized) == true
         }
     }
+
+    /**
+     * Filters countries by continent.
+     *
+     * @param continent The continent to filter by.
+     */
+    fun continent(continent: Continent) { predicates.add { it.continent == continent } }
+
+    /**
+     * Filters countries by UN geoscheme region.
+     *
+     * @param region The region to filter by.
+     */
+    fun region(region: Region) { predicates.add { it.region == region } }
+
+    /**
+     * Filters countries by international calling code.
+     *
+     * @param code The calling code string (e.g., "+1").
+     */
+    fun callingCode(code: String) { predicates.add { it.callingCode.value == code } }
+
+    /**
+     * Filters countries by primary currency code (ISO 4217).
+     *
+     * @param code The currency code string (e.g., "USD").
+     */
+    fun currency(code: String) { predicates.add { it.currency.value == code } }
+
+    /**
+     * Filters countries by primary IANA timezone identifier.
+     *
+     * @param id The timezone identifier string (e.g., "Europe/Paris").
+     */
+    fun timezone(id: String) { predicates.add { it.timezone.value == id } }
 
     /**
      * Combines multiple predicates with OR logic.
