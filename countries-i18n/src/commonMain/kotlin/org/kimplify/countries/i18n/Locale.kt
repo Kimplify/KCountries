@@ -21,5 +21,9 @@ value class Locale(val code: String) {
         val JA = Locale("ja")
         val PT = Locale("pt")
         val HI = Locale("hi")
+        val KO = Locale("ko")
+        val IT = Locale("it")
+        val TR = Locale("tr")
+        val ID = Locale("id")
     }
 }

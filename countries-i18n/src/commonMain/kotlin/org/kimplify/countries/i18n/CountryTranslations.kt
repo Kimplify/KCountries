@@ -4,13 +4,20 @@ import org.kimplify.countries.i18n.data.*
 
 object CountryTranslations {
 
-    private val translationMaps = mapOf(
+    private val translationMaps: Map<Locale, Map<String, String>> = mapOf(
         Locale.ES to esTranslations,
         Locale.FR to frTranslations,
         Locale.DE to deTranslations,
         Locale.AR to arTranslations,
         Locale.ZH to zhTranslations,
-        Locale.RU to ruTranslations
+        Locale.RU to ruTranslations,
+        Locale.JA to jaTranslations,
+        Locale.PT to ptTranslations,
+        Locale.HI to hiTranslations,
+        Locale.KO to koTranslations,
+        Locale.IT to itTranslations,
+        Locale.TR to trTranslations,
+        Locale.ID to idTranslations
     )
 
     fun getTranslation(alpha2: String, locale: Locale): String? {

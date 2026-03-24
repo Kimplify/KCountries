@@ -79,15 +79,22 @@ class TranslationTest {
     }
 
     @Test
-    fun `supportedLocales contains all 6 languages`() {
+    fun `supportedLocales contains all 13 languages`() {
         val locales = CountryTranslations.supportedLocales
-        assertEquals(6, locales.size)
+        assertEquals(13, locales.size)
         assertTrue(locales.contains(Locale.ES))
         assertTrue(locales.contains(Locale.FR))
         assertTrue(locales.contains(Locale.DE))
         assertTrue(locales.contains(Locale.AR))
         assertTrue(locales.contains(Locale.ZH))
         assertTrue(locales.contains(Locale.RU))
+        assertTrue(locales.contains(Locale.JA))
+        assertTrue(locales.contains(Locale.PT))
+        assertTrue(locales.contains(Locale.HI))
+        assertTrue(locales.contains(Locale.KO))
+        assertTrue(locales.contains(Locale.IT))
+        assertTrue(locales.contains(Locale.TR))
+        assertTrue(locales.contains(Locale.ID))
     }
 
     @Test
