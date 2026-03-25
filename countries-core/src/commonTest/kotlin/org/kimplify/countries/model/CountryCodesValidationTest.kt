@@ -59,15 +59,19 @@ class CountryCodesValidationTest {
     }
 
     @Test
-    fun flagEmojiEnforcesValidLength() {
-        val emoji = FlagEmoji("\uD83C\uDDFA\uD83C\uDDF8")
-        assertEquals("\uD83C\uDDFA\uD83C\uDDF8", emoji.value)
+    fun flagEmojiRequiresExactlyTwoRegionalIndicatorCodepoints() {
+        // Valid flag emojis (2 regional indicator symbols)
+        FlagEmoji("🇺🇸") // US
+        FlagEmoji("🇬🇧") // GB
+        FlagEmoji("🇯🇵") // JP
 
-        assertFailsWith<IllegalArgumentException> {
-            FlagEmoji("")
-        }
-        assertFailsWith<IllegalArgumentException> {
-            FlagEmoji("A")
-        }
+        // Reject ASCII strings that happen to have length 4
+        assertFailsWith<IllegalArgumentException> { FlagEmoji("ABCD") }
+        // Reject single regional indicator
+        assertFailsWith<IllegalArgumentException> { FlagEmoji("🇺") }
+        // Reject empty
+        assertFailsWith<IllegalArgumentException> { FlagEmoji("") }
+        // Reject non-flag emoji
+        assertFailsWith<IllegalArgumentException> { FlagEmoji("😀😀") }
     }
 }

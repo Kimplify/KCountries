@@ -16,8 +16,18 @@ fun Country.getLocalizedName(locale: Locale): String {
 }
 
 fun Country.getLocalizedName(localeCode: String = "en"): String {
-    return when (localeCode.lowercase()) {
-        "en" -> getDisplayName()
-        else -> getLocalizedName(Locale(localeCode))
+    val normalized = localeCode
+        .split('-', '_')
+        .firstOrNull()
+        ?.lowercase()
+        ?: return getDisplayName()
+
+    if (normalized == "en") return getDisplayName()
+    if (normalized.length != 2) return getDisplayName()
+
+    return try {
+        getLocalizedName(Locale(normalized))
+    } catch (_: IllegalArgumentException) {
+        getDisplayName()
     }
 }

@@ -1,7 +1,12 @@
 package org.kimplify.countries.dsl
 
 import org.kimplify.countries.model.*
+import org.kimplify.countries.model.Continent
+import org.kimplify.countries.model.Region
 import org.kimplify.countries.repository.CountriesRepository
+
+@DslMarker
+annotation class CountriesDsl
 
 /**
  * DSL builder for querying countries with a fluent, declarative syntax.
@@ -33,10 +38,11 @@ import org.kimplify.countries.repository.CountriesRepository
  *
  * @property repository The repository to query against.
  */
+@CountriesDsl
 class CountriesQuery internal constructor(
     private val repository: CountriesRepository
 ) {
-    private val predicates = mutableListOf<(Country) -> Boolean>()
+    internal val predicates = mutableListOf<(Country) -> Boolean>()
 
     /**
      * Filters countries by alpha-2 code (case-insensitive).
@@ -103,6 +109,7 @@ class CountriesQuery internal constructor(
      * @param text The text to search for in country names.
      */
     fun nameContains(text: String) {
+        if (text.isBlank()) return
         val normalized = text.lowercase()
         predicates.add { country ->
             country.name.value.lowercase().contains(normalized) ||
@@ -158,6 +165,41 @@ class CountriesQuery internal constructor(
     }
 
     /**
+     * Filters countries by continent.
+     *
+     * @param continent The continent to filter by.
+     */
+    fun continent(continent: Continent) { predicates.add { it.continent == continent } }
+
+    /**
+     * Filters countries by UN geoscheme region.
+     *
+     * @param region The region to filter by.
+     */
+    fun region(region: Region) { predicates.add { it.region == region } }
+
+    /**
+     * Filters countries by international calling code.
+     *
+     * @param code The calling code string (e.g., "+1").
+     */
+    fun callingCode(code: String) { predicates.add { it.callingCode.value == code } }
+
+    /**
+     * Filters countries by primary currency code (ISO 4217).
+     *
+     * @param code The currency code string (e.g., "USD").
+     */
+    fun currency(code: String) { predicates.add { it.currency.value == code } }
+
+    /**
+     * Filters countries by primary IANA timezone identifier.
+     *
+     * @param id The timezone identifier string (e.g., "Europe/Paris").
+     */
+    fun timezone(id: String) { predicates.add { it.timezone.value == id } }
+
+    /**
      * Combines multiple predicates with OR logic.
      *
      * Countries matching any of the predicates in the OR block will be included.
@@ -176,9 +218,36 @@ class CountriesQuery internal constructor(
      * @param block The DSL block containing predicates to combine with OR.
      */
     fun or(block: CountriesQuery.() -> Unit) {
-        val subQuery = CountriesQuery(repository).apply(block)
+        val subQuery = CountriesQuery(repository)
+        subQuery.block()
+        if (subQuery.predicates.isEmpty()) return
         predicates.add { country ->
             subQuery.predicates.any { predicate -> predicate(country) }
+        }
+    }
+
+    /**
+     * Excludes countries that match any predicate in the given block.
+     *
+     * Countries matching none of the predicates in the NOT block will be included.
+     *
+     * Example:
+     * ```
+     * query {
+     *     not {
+     *         continent(Continent.EUROPE)
+     *     }
+     * }
+     * ```
+     *
+     * @param block The DSL block containing predicates to negate.
+     */
+    fun not(block: CountriesQuery.() -> Unit) {
+        val subQuery = CountriesQuery(repository)
+        subQuery.block()
+        if (subQuery.predicates.isEmpty()) return
+        predicates.add { country ->
+            !subQuery.predicates.any { it(country) }
         }
     }
 
@@ -204,7 +273,8 @@ class CountriesQuery internal constructor(
  */
 class CountriesQueryResult internal constructor(
     private val countries: List<Country>
-) {
+) : Iterable<Country> {
+    override fun iterator(): Iterator<Country> = countries.iterator()
     /**
      * Returns the first matching country, or null if no matches.
      *

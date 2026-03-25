@@ -7,15 +7,15 @@ android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
 
-androidx-activity = "1.12.2"
-androidx-lifecycle = "2.9.6"
-composeMultiplatform = "1.10.0-rc02"
+androidx-activity = "1.13.0"
+androidx-lifecycle = "2.10.0"
+composeMultiplatform = "1.11.0-alpha04"
 junit = "4.13.2"
-kotlin = "2.2.21"
+kotlin = "2.3.20"
 kotlinx-coroutines = "1.10.2"
 composeBom = "2025.12.01"
 kotlinCodepoints = "0.11.0"
-maven-publish = "0.35.0"
+maven-publish = "0.36.0"
 
 
 [libraries]

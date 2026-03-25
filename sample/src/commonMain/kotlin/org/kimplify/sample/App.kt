@@ -78,7 +78,14 @@ fun CountriesScreen() {
                                 Locale.DE to "Deutsch",
                                 Locale.AR to "العربية",
                                 Locale.ZH to "中文",
-                                Locale.RU to "Русский"
+                                Locale.RU to "Русский",
+                                Locale.JA to "日本語",
+                                Locale.PT to "Português",
+                                Locale.HI to "हिन्दी",
+                                Locale.KO to "한국어",
+                                Locale.IT to "Italiano",
+                                Locale.TR to "Türkçe",
+                                Locale.ID to "Bahasa Indonesia"
                             ).forEach { (locale, name) ->
                                 DropdownMenuItem(
                                     text = {
@@ -139,7 +146,7 @@ fun CountriesScreen() {
                         InfoItem("Version", Countries.VERSION)
                         InfoItem("Total", Countries.TOTAL_COUNTRIES.toString())
                         InfoItem("Shown", filteredCountries.size.toString())
-                        InfoItem("Languages", "7")
+                        InfoItem("Languages", "14")
                     }
                 }
             }
@@ -290,6 +297,11 @@ fun CountryDetailsDialog(
                 DetailRow("ISO Alpha-2", country.alpha2.value)
                 DetailRow("ISO Alpha-3", country.alpha3.value)
                 DetailRow("Numeric Code", country.numeric.value)
+                DetailRow("Continent", country.continent.name.lowercase().replaceFirstChar { it.uppercase() }.replace('_', ' '))
+                DetailRow("Region", country.region.name.lowercase().replaceFirstChar { it.uppercase() }.replace('_', ' '))
+                DetailRow("Calling Code", country.callingCode.value)
+                DetailRow("Currency", country.currency.value)
+                DetailRow("Timezone", country.timezone.value)
 
                 if (country.displayName != null) {
                     DetailRow("Display Name", country.displayName!!)

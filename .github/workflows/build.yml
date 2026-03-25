@@ -11,7 +11,7 @@ jobs:
     runs-on: macOS-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up JDK 21
         uses: actions/setup-java@v5
@@ -26,16 +26,16 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
 
       - name: Run JVM tests
-        run: ./gradlew :deci:jvmTest
+        run: ./gradlew :countries-core:jvmTest :countries-i18n:jvmTest
 
       - name: Run iOS tests
-        run: ./gradlew :deci:iosSimulatorArm64Test
+        run: ./gradlew :countries-core:iosSimulatorArm64Test :countries-i18n:iosSimulatorArm64Test
 
       - name: Run JS tests
-        run: ./gradlew :deci:jsTest
+        run: ./gradlew :countries-core:jsTest :countries-i18n:jsTest
 
       - name: Run WasmJs tests
-        run: ./gradlew :deci:wasmJsTest
+        run: ./gradlew :countries-core:wasmJsTest :countries-i18n:wasmJsTest
 
       - name: Upload test reports
         if: always()
@@ -43,8 +43,10 @@ jobs:
         with:
           name: test-reports
           path: |
-            deci/build/reports/tests/
-            deci/build/test-results/
+            countries-core/build/reports/tests/
+            countries-core/build/test-results/
+            countries-i18n/build/reports/tests/
+            countries-i18n/build/test-results/
           retention-days: 30
 
   build:
@@ -65,4 +67,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
 
       - name: Build library
-        run: ./gradlew build --no-configuration-cache
+        run: ./gradlew :countries-core:build :countries-i18n:build --no-configuration-cache

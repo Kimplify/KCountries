@@ -245,7 +245,6 @@ internal val deTranslations = mapOf(
     "VU" to "Vanuatu",
     "WF" to "Wallis und Futuna",
     "WS" to "Samoa",
-    "XK" to "Kosovo",
     "YE" to "Jemen",
     "YT" to "Mayotte",
     "ZA" to "Südafrika",

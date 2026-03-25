@@ -7,6 +7,9 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import org.kimplify.countries.model.Continent
+import org.kimplify.countries.model.Country
+import org.kimplify.countries.model.Region
 import org.kimplify.countries.repository.InMemoryCountriesRepository
 import org.kimplify.countries.testdata.TestCountries
 
@@ -82,5 +85,70 @@ class CountriesQueryTest {
         assertFailsWith<NoSuchElementException> {
             result.first()
         }
+    }
+
+    @Test
+    fun continentPredicateFiltersCorrectly() {
+        val result = repository.query { continent(Continent.EUROPE) }
+        assertEquals(2, result.count())
+    }
+
+    @Test
+    fun regionPredicateFiltersCorrectly() {
+        val result = repository.query { region(Region.WESTERN_EUROPE) }
+        assertEquals(1, result.count())
+    }
+
+    @Test
+    fun callingCodePredicateFiltersCorrectly() {
+        val result = repository.query { callingCode("+1") }
+        assertEquals(2, result.count())
+    }
+
+    @Test
+    fun currencyPredicateFiltersCorrectly() {
+        val result = repository.query { currency("GBP") }
+        assertEquals(1, result.count())
+    }
+
+    @Test
+    fun timezonePredicateFiltersCorrectly() {
+        val result = repository.query { timezone("Europe/Paris") }
+        assertEquals(1, result.count())
+    }
+
+    @Test
+    fun queryResultIsIterable() {
+        val result = repository.query { continent(Continent.EUROPE) }
+        val collected = mutableListOf<Country>()
+        for (country in result) {
+            collected.add(country)
+        }
+        assertEquals(result.toList(), collected)
+    }
+
+    @Test
+    fun notCombinatorExcludesMatchingCountries() {
+        val result = repository.query {
+            not { continent(Continent.EUROPE) }
+        }
+        assertTrue(result.toList().none { it.continent == Continent.EUROPE })
+        assertEquals(2, result.count()) // US and Canada
+    }
+
+    @Test
+    fun orWithEmptyBlockDoesNotFilterOutEverything() {
+        val result = repository.query {
+            or { }
+        }
+        assertEquals(4, result.count())
+    }
+
+    @Test
+    fun nameContainsWithBlankStringIsNoOp() {
+        val result = repository.query {
+            nameContains("")
+        }
+        assertEquals(4, result.count())
     }
 }

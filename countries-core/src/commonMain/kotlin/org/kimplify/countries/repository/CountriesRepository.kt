@@ -3,6 +3,10 @@ package org.kimplify.countries.repository
 import org.kimplify.countries.dsl.CountriesQuery
 import org.kimplify.countries.dsl.CountriesQueryResult
 import org.kimplify.countries.model.*
+import org.kimplify.countries.model.CallingCode
+import org.kimplify.countries.model.Continent
+import org.kimplify.countries.model.CurrencyCode
+import org.kimplify.countries.model.Region
 
 /**
  * Repository for accessing country data with efficient indexed lookups.
@@ -55,6 +59,38 @@ interface CountriesRepository {
     fun searchByName(query: String): List<Country>
 
     /**
+     * Returns all countries on the given continent.
+     *
+     * @param continent The continent to filter by.
+     * @return List of countries on the continent.
+     */
+    fun getByContinent(continent: Continent): List<Country>
+
+    /**
+     * Returns all countries in the given region.
+     *
+     * @param region The region to filter by.
+     * @return List of countries in the region.
+     */
+    fun getByRegion(region: Region): List<Country>
+
+    /**
+     * Returns all countries with the given international calling code.
+     *
+     * @param callingCode The calling code to filter by (e.g., CallingCode("+1")).
+     * @return List of countries with that calling code.
+     */
+    fun getByCallingCode(callingCode: CallingCode): List<Country>
+
+    /**
+     * Returns all countries that use the given currency.
+     *
+     * @param currencyCode The ISO 4217 currency code to filter by.
+     * @return List of countries using that currency.
+     */
+    fun getByCurrency(currencyCode: CurrencyCode): List<Country>
+
+    /**
      * Creates a DSL query builder for complex filtering.
      *
      * Example:
@@ -96,6 +132,11 @@ internal class InMemoryCountriesRepository(
         countries.associateBy { it.numeric }
     }
 
+    private val continentIndex: Map<Continent, List<Country>> by lazy { countries.groupBy { it.continent } }
+    private val regionIndex: Map<Region, List<Country>> by lazy { countries.groupBy { it.region } }
+    private val callingCodeIndex: Map<CallingCode, List<Country>> by lazy { countries.groupBy { it.callingCode } }
+    private val currencyIndex: Map<CurrencyCode, List<Country>> by lazy { countries.groupBy { it.currency } }
+
     override fun getAll(): List<Country> = countries
 
     override fun findByAlpha2(code: Alpha2Code): Country? =
@@ -106,6 +147,11 @@ internal class InMemoryCountriesRepository(
 
     override fun findByNumeric(code: NumericCode): Country? =
         numericIndex[code]
+
+    override fun getByContinent(continent: Continent) = continentIndex[continent] ?: emptyList()
+    override fun getByRegion(region: Region) = regionIndex[region] ?: emptyList()
+    override fun getByCallingCode(callingCode: CallingCode) = callingCodeIndex[callingCode] ?: emptyList()
+    override fun getByCurrency(currencyCode: CurrencyCode) = currencyIndex[currencyCode] ?: emptyList()
 
     override fun searchByName(query: String): List<Country> {
         if (query.isBlank()) return emptyList()

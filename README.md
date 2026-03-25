@@ -5,22 +5,23 @@ A lightweight, high-performance Kotlin Multiplatform library providing ISO 3166-
 ## Features
 
 - **249 Countries**: Complete ISO 3166-1 dataset with codes, names, and flags
+- **Rich Metadata**: Continent, region, calling code, currency, and timezone for every country
 - **Native Names**: Authentic country names in local scripts (日本, Россия, مصر, etc.)
-- **7 Languages**: Optional i18n module with Spanish, French, German, Arabic, Chinese, Russian
+- **14 Languages**: Optional i18n module with ES, FR, DE, AR, ZH, RU, JA, PT, HI, KO, IT, TR, ID
 - **User-Friendly Names**: Display names without formal ISO formatting
 - **Type-Safe API**: Inline value classes for codes (zero runtime overhead)
 - **Multiple Access Patterns**: Repository, DSL queries, and extension functions
 - **Platform Support**: Android, iOS, JVM, JS, WASM
-- **Minimal Size**: ~50KB core + ~50KB i18n (optional)
+- **Minimal Size**: ~50KB core + ~100KB i18n (optional)
 - **Fast Performance**: O(1) hash-indexed lookups
 
 ## Installation
 
 ```kotlin
 dependencies {
-    implementation("org.kimplify:countries-core:0.1.0")
+    implementation("org.kimplify:countries-core:0.1.1")
 
-    // Optional: Multilingual support
+    // Optional: Multilingual support (14 languages)
     implementation("org.kimplify:countries-i18n:0.1.1")
 }
 ```
@@ -64,10 +65,24 @@ val northAmericans = Countries.repository.query {
     }
 }.toList()
 
-// Count results
-val count = Countries.repository.query {
-    nameStartsWith("United")
-}.count()
+// Filter by continent, region, calling code, currency, timezone
+val europeanCountries = Countries.repository.query {
+    continent(Continent.EUROPE)
+}.toList()
+
+val westernEurope = Countries.repository.query {
+    region(Region.WESTERN_EUROPE)
+}.toList()
+
+// NOT logic
+val nonEuropean = Countries.repository.query {
+    not { continent(Continent.EUROPE) }
+}.toList()
+
+// Iterate directly (CountriesQueryResult implements Iterable)
+for (country in Countries.repository.query { currency("EUR") }) {
+    println("${country.getDisplayName()} uses EUR")
+}
 ```
 
 ### Extension Functions
@@ -86,6 +101,13 @@ val nativeName = "JP".nativeCountryName   // "日本"
 // Convert between formats
 val alpha3 = "US".toAlpha3  // "USA"
 val alpha2 = "USA".toAlpha2  // "US"
+
+// Access metadata
+val code = "US".callingCode    // "+1"
+val curr = "JP".currencyCode   // "JPY"
+val cont = "BR".continent      // Continent.SOUTH_AMERICA
+val reg = "BR".region           // Region.SOUTH_AMERICA
+val tz = "DE".timezone          // "Europe/Berlin"
 ```
 
 ## Data Model
@@ -99,8 +121,13 @@ data class Country(
     val numeric: NumericCode,      // ISO 3166-1 numeric (e.g., "840")
     val name: CountryName,         // Formal ISO name (e.g., "United States of America (the)")
     val flag: FlagEmoji,           // Flag emoji (e.g., "🇺🇸")
-    val displayName: String? = null,  // User-friendly name (e.g., "United States")
-    val native: String? = null        // Native language name (e.g., "日本")
+    val displayName: String?,      // User-friendly name (e.g., "United States")
+    val native: String?,           // Native language name (e.g., "日本")
+    val continent: Continent,      // Geographic continent (e.g., NORTH_AMERICA)
+    val region: Region,            // UN geoscheme region (e.g., NORTHERN_AMERICA)
+    val callingCode: CallingCode,  // E.164 calling code (e.g., "+1")
+    val currency: CurrencyCode,    // ISO 4217 currency (e.g., "USD")
+    val timezone: TimezoneId       // IANA timezone (e.g., "America/New_York")
 )
 ```
 
@@ -118,7 +145,15 @@ All codes are wrapped in inline value classes for type safety with zero runtime 
 - `Alpha3Code`: 3-letter country code
 - `NumericCode`: 3-digit country code
 - `CountryName`: Country name string
-- `FlagEmoji`: Flag emoji string
+- `FlagEmoji`: Flag emoji (validated via Unicode codepoints)
+- `CallingCode`: E.164 calling code (e.g., "+1", "+44")
+- `CurrencyCode`: ISO 4217 currency code (e.g., "USD", "EUR")
+- `TimezoneId`: IANA timezone identifier (e.g., "America/New_York")
+
+### Enums
+
+- `Continent`: 7 continents (AFRICA, ANTARCTICA, ASIA, EUROPE, NORTH_AMERICA, OCEANIA, SOUTH_AMERICA)
+- `Region`: 23 UN geoscheme regions (CARIBBEAN, EASTERN_EUROPE, SOUTHEASTERN_ASIA, etc.)
 
 ## API Reference
 
@@ -127,7 +162,7 @@ All codes are wrapped in inline value classes for type safety with zero runtime 
 ```kotlin
 object Countries {
     val repository: CountriesRepository  // Main data access point
-    const val VERSION: String            // Library version
+    val VERSION: String                  // Library version (auto-generated from catalog)
     const val TOTAL_COUNTRIES: Int       // Total countries (249)
 }
 ```
@@ -141,6 +176,10 @@ interface CountriesRepository {
     fun findByAlpha3(code: Alpha3Code): Country?
     fun findByNumeric(code: NumericCode): Country?
     fun searchByName(query: String): List<Country>
+    fun getByContinent(continent: Continent): List<Country>
+    fun getByRegion(region: Region): List<Country>
+    fun getByCallingCode(callingCode: CallingCode): List<Country>
+    fun getByCurrency(currencyCode: CurrencyCode): List<Country>
     fun query(block: CountriesQuery.() -> Unit): CountriesQueryResult
 }
 ```
@@ -148,6 +187,7 @@ interface CountriesRepository {
 ### DSL Query Builder
 
 ```kotlin
+@CountriesDsl
 class CountriesQuery {
     fun alpha2(code: String)
     fun alpha3(code: String)
@@ -155,10 +195,16 @@ class CountriesQuery {
     fun nameContains(text: String)
     fun nameEquals(name: String)
     fun nameStartsWith(prefix: String)
+    fun continent(continent: Continent)
+    fun region(region: Region)
+    fun callingCode(code: String)
+    fun currency(code: String)
+    fun timezone(id: String)
     fun or(block: CountriesQuery.() -> Unit)
+    fun not(block: CountriesQuery.() -> Unit)
 }
 
-class CountriesQueryResult {
+class CountriesQueryResult : Iterable<Country> {
     fun firstOrNull(): Country?
     fun first(): Country
     fun toList(): List<Country>
@@ -170,8 +216,8 @@ class CountriesQueryResult {
 
 ## Performance
 
-- **Core library**: ~50KB (249 countries with native names)
-- **I18n module**: ~50KB (6 languages × 250 translations)
+- **Core library**: ~80KB (249 countries with native names + metadata)
+- **I18n module**: ~100KB (13 languages × 249 translations)
 - **Initialization**: <10ms (lazy)
 - **Lookups**: O(1) hash-indexed, <1ms
 - **Translations**: O(1) map lookup
@@ -198,13 +244,13 @@ No platform-specific code needed!
 ## Versioning
 
 Semantic versioning: `MAJOR.MINOR.PATCH`
-- **Current**: 1.0.0
-- **Data updates**: MINOR bump (e.g., 1.1.0)
-- **API changes**: MAJOR bump (e.g., 2.0.0)
+- **Current**: 0.1.1
+- **Data updates**: MINOR bump
+- **API changes**: MAJOR bump
 
 ## Internationalization (countries-i18n)
 
-Optional module providing country name translations in 6 languages.
+Optional module providing country name translations in 13 languages (+ English fallback).
 
 ```kotlin
 val country = Countries.repository.findByAlpha2(Alpha2Code("JP"))!!
@@ -216,12 +262,24 @@ country.getLocalizedName(Locale.DE)  // "Japan"
 country.getLocalizedName(Locale.AR)  // "اليابان"
 country.getLocalizedName(Locale.ZH)  // "日本"
 country.getLocalizedName(Locale.RU)  // "Япония"
+country.getLocalizedName(Locale.JA)  // "日本"
+country.getLocalizedName(Locale.PT)  // "Japão"
+country.getLocalizedName(Locale.KO)  // "일본"
+country.getLocalizedName(Locale.IT)  // "Giappone"
+country.getLocalizedName(Locale.TR)  // "Japonya"
+country.getLocalizedName(Locale.HI)  // "जापान"
+country.getLocalizedName(Locale.ID)  // "Jepang"
+
+// Locale strings are normalized automatically
+country.getLocalizedName("es-MX")  // "Japón" (extracts "es")
+country.getLocalizedName("PT_BR")  // "Japão" (extracts "pt")
 ```
 
 **Supported Languages:**
-- English (en), Spanish (es), French (fr), German (de)
-- Arabic (ar) with RTL support
-- Chinese (zh), Russian (ru)
+- English (en), Spanish (es), French (fr), German (de), Italian (it)
+- Arabic (ar) with RTL support, Turkish (tr), Indonesian (id)
+- Chinese (zh), Japanese (ja), Korean (ko), Hindi (hi)
+- Russian (ru), Portuguese (pt)
 
 See [countries-i18n/README.md](countries-i18n/README.md) for full documentation.
 
@@ -238,4 +296,5 @@ See [countries-i18n/README.md](countries-i18n/README.md) for full documentation.
 - **Standard**: ISO 3166-1:2020
 - **Total Entries**: 249 territories
 - **Includes**: 193 UN member states + 56 dependencies/special areas
+- **Metadata Sources**: UN M49 (regions), ITU-T E.164 (calling codes), ISO 4217 (currencies), IANA (timezones)
 - **Last Updated**: 2025-01-26

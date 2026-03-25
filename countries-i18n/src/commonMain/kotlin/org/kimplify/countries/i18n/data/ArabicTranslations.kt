@@ -245,7 +245,6 @@ internal val arTranslations = mapOf(
     "VU" to "فانواتو",
     "WF" to "واليس وفوتونا",
     "WS" to "ساموا",
-    "XK" to "كوسوفو",
     "YE" to "اليمن",
     "YT" to "مايوت",
     "ZA" to "جنوب أفريقيا",
