@@ -13,7 +13,7 @@ kotlin {
 }
 
 android {
-    namespace = "org.kimplify.sample.android"
+    namespace = "org.kimplify.sample"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
