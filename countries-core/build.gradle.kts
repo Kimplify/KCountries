@@ -73,7 +73,11 @@ val generateVersionFile = tasks.register("generateVersionFile") {
 }
 
 kotlin.sourceSets.commonMain {
-    kotlin.srcDir(generateVersionFile.map { it.outputs.files.singleFile }).builtBy(generateVersionFile)
+    kotlin.srcDir(generateVersionFile.map { it.outputs.files.singleFile })
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().configureEach {
+    dependsOn(generateVersionFile)
 }
 
 android {
@@ -89,7 +93,7 @@ android {
 //https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-libraries.html
 mavenPublishing {
     publishToMavenCentral()
-    signAllPublications()
+//    signAllPublications()
     coordinates("org.kimplify", "countries-core", libs.versions.kcountries.get())
 
     pom {
