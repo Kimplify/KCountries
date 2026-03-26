@@ -73,7 +73,7 @@ val generateVersionFile = tasks.register("generateVersionFile") {
 }
 
 kotlin.sourceSets.commonMain {
-    kotlin.srcDir(generateVersionFile.map { it.outputs.files.singleFile })
+    kotlin.srcDir(generateVersionFile.map { it.outputs.files.singleFile }).builtBy(generateVersionFile)
 }
 
 android {
