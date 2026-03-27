@@ -93,7 +93,7 @@ android {
 //https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-libraries.html
 mavenPublishing {
     publishToMavenCentral()
-//    signAllPublications()
+    signAllPublications()
     coordinates("org.kimplify", "countries-core", libs.versions.kcountries.get())
 
     pom {
