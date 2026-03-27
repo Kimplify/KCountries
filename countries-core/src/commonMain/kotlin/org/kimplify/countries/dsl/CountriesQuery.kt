@@ -42,7 +42,7 @@ annotation class CountriesDsl
 class CountriesQuery internal constructor(
     private val repository: CountriesRepository
 ) {
-    internal val predicates = mutableListOf<(Country) -> Boolean>()
+    private val predicates = mutableListOf<(Country) -> Boolean>()
 
     /**
      * Filters countries by alpha-2 code (case-insensitive).

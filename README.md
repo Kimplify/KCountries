@@ -102,12 +102,13 @@ val nativeName = "JP".nativeCountryName   // "日本"
 val alpha3 = "US".toAlpha3  // "USA"
 val alpha2 = "USA".toAlpha2  // "US"
 
-// Access metadata
-val code = "US".callingCode    // "+1"
-val curr = "JP".currencyCode   // "JPY"
-val cont = "BR".continent      // Continent.SOUTH_AMERICA
-val reg = "BR".region           // Region.SOUTH_AMERICA
-val tz = "DE".timezone          // "Europe/Berlin"
+// Access metadata via toCountry()
+val country = "US".toCountry()!!
+val code = country.callingCode    // CallingCode("+1")
+val curr = country.currency       // CurrencyCode("USD")
+val cont = country.continent      // Continent.NORTH_AMERICA
+val reg = country.region           // Region.NORTHERN_AMERICA
+val tz = country.timezone          // TimezoneId("America/New_York")
 ```
 
 ## Data Model

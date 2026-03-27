@@ -1,6 +1,6 @@
 # KCountries I18n
 
-Internationalization module for KCountries library providing country name translations in 13 languages.
+Internationalization module for KCountries library providing country name translations in 14 languages.
 
 ## Features
 
@@ -9,7 +9,7 @@ Internationalization module for KCountries library providing country name transl
 - **249 Countries**: Complete translation coverage for all languages
 - **Smart Normalization**: Accepts `"en-US"`, `"PT_BR"`, `"ES"` — extracts the language automatically
 - **Multiplatform**: Works on Android, iOS, JVM, JS, and WASM
-- **Zero Dependencies**: Standalone module with static data
+- **No Additional Dependencies**: Only depends on countries-core; uses static data
 - **Fast**: O(1) lookup with in-memory maps
 
 ## Installation
