@@ -17,20 +17,72 @@ A lightweight, high-performance Kotlin Multiplatform library providing ISO 3166-
 
 ## Installation
 
+All artifacts are published to [Maven Central](https://central.sonatype.com/search?q=org.kimplify), so make sure it is listed in your repositories:
+
+```kotlin
+repositories {
+    mavenCentral()
+}
+```
+
+Then add the dependencies:
+
 ```kotlin
 dependencies {
-    implementation("org.kimplify:countries-core:0.1.1")
+    implementation("org.kimplify:countries-core:0.2.0")
 
     // Optional: Multilingual support (14 languages)
-    implementation("org.kimplify:countries-i18n:0.1.1")
+    implementation("org.kimplify:countries-i18n:0.2.0")
+}
+```
+
+### Kotlin Multiplatform
+
+In a KMP project, add the dependencies to the `commonMain` source set — a single dependency covers all targets (Android, iOS, JVM, JS, WASM):
+
+```kotlin
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("org.kimplify:countries-core:0.2.0")
+            implementation("org.kimplify:countries-i18n:0.2.0") // optional
+        }
+    }
+}
+```
+
+### Version Catalog
+
+If you use a version catalog, add to `gradle/libs.versions.toml`:
+
+```toml
+[versions]
+kcountries = "0.2.0"
+
+[libraries]
+kcountries-core = { module = "org.kimplify:countries-core", version.ref = "kcountries" }
+kcountries-i18n = { module = "org.kimplify:countries-i18n", version.ref = "kcountries" }
+```
+
+```kotlin
+dependencies {
+    implementation(libs.kcountries.core)
+    implementation(libs.kcountries.i18n) // optional
 }
 ```
 
 ## Usage
 
+Everything lives under the `org.kimplify.countries` package. The examples below include the imports they need.
+
 ### Repository Pattern
 
 ```kotlin
+import org.kimplify.countries.Countries
+import org.kimplify.countries.model.Alpha2Code
+import org.kimplify.countries.model.Alpha3Code
+import org.kimplify.countries.model.NumericCode
+
 // Get all countries
 val allCountries = Countries.repository.getAll()
 
@@ -46,6 +98,10 @@ val results = Countries.repository.searchByName("United")
 ### DSL Query Builder
 
 ```kotlin
+import org.kimplify.countries.Countries
+import org.kimplify.countries.model.Continent
+import org.kimplify.countries.model.Region
+
 // Single filter
 val usa = Countries.repository.query {
     alpha2("US")
@@ -88,6 +144,8 @@ for (country in Countries.repository.query { currency("EUR") }) {
 ### Extension Functions
 
 ```kotlin
+import org.kimplify.countries.extensions.*
+
 // Convert code to country
 val usa = "US".toCountry()
 val france = "FRA".toCountry()
@@ -245,7 +303,7 @@ No platform-specific code needed!
 ## Versioning
 
 Semantic versioning: `MAJOR.MINOR.PATCH`
-- **Current**: 0.1.1
+- **Current**: 0.2.0
 - **Data updates**: MINOR bump
 - **API changes**: MAJOR bump
 
@@ -254,6 +312,9 @@ Semantic versioning: `MAJOR.MINOR.PATCH`
 Optional module providing country name translations in 13 languages (+ English fallback).
 
 ```kotlin
+import org.kimplify.countries.i18n.Locale
+import org.kimplify.countries.i18n.extensions.getLocalizedName
+
 val country = Countries.repository.findByAlpha2(Alpha2Code("JP"))!!
 
 country.getLocalizedName(Locale.EN)  // "Japan"
